@@ -1,4 +1,4 @@
-package com.demo.swagger.swagger.entity;
+package com.demo.swagger.swagger.controller.param;
 
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
@@ -6,7 +6,7 @@ import lombok.Data;
 import java.io.Serializable;
 
 @Data
-public class MallUpdateUser implements Serializable {
+public class MallUpdateUserParam implements Serializable {
 
     @ApiModelProperty("User Nick Name")
     private String nickName;

@@ -1,9 +1,9 @@
 package com.demo.swagger.swagger.service.impl;
 
 import com.demo.swagger.swagger.common.ServiceResultEnum;
+import com.demo.swagger.swagger.controller.param.MallUpdateUserParam;
 import com.demo.swagger.swagger.dao.MallUserMapper;
 import com.demo.swagger.swagger.dao.MallUserTokenMapper;
-import com.demo.swagger.swagger.entity.MallUpdateUser;
 import com.demo.swagger.swagger.entity.MallUser;
 import com.demo.swagger.swagger.entity.MallUserToken;
 import com.demo.swagger.swagger.service.NewBeeMallUserService;
@@ -63,15 +63,15 @@ public class NewBeeMallUserServiceImpl implements NewBeeMallUserService {
     }
 
     @Override
-    public boolean updateUserInfo(MallUpdateUser mallUpdateUser, Long userId) {
+    public boolean updateUserInfo(MallUpdateUserParam mallUpdateUserParam, Long userId) {
         MallUser mallUser = mallUserMapper.selectByPrimaryKey(userId);
         if (mallUser == null) {
             return false;
         }
 
-        mallUser.setNickName(mallUpdateUser.getNickName());
-        mallUser.setPasswordMD5(mallUpdateUser.getPasswordMD5());
-        mallUser.setIntroduceSign(mallUpdateUser.getIntroduceSign());
+        mallUser.setNickName(mallUpdateUserParam.getNickName());
+        mallUser.setPasswordMD5(mallUpdateUserParam.getPasswordMD5());
+        mallUser.setIntroduceSign(mallUpdateUserParam.getIntroduceSign());
         if (mallUserMapper.updateByPrimaryKey(mallUser) > 0) {
             return true;
         }

@@ -2,9 +2,9 @@ package com.demo.swagger.swagger.controller;
 
 import com.demo.swagger.swagger.common.Constants;
 import com.demo.swagger.swagger.config.annotation.TokenToMallUser;
+import com.demo.swagger.swagger.controller.param.MallUpdateUserParam;
 import com.demo.swagger.swagger.controller.param.MallUserLoginParam;
 import com.demo.swagger.swagger.controller.vo.NewBeeMallUserVO;
-import com.demo.swagger.swagger.entity.MallUpdateUser;
 import com.demo.swagger.swagger.entity.MallUser;
 import com.demo.swagger.swagger.entity.Result;
 import com.demo.swagger.swagger.service.NewBeeMallUserService;
@@ -70,9 +70,9 @@ public class NewBeeMallUserController {
 
     @ApiOperation(value = "Update User Detail", notes = "Update User Detail")
     @PutMapping("/user/info")
-    public Result<String> updateUserDetail(@RequestBody @ApiParam("Update User Info") MallUpdateUser mallUpdateUser,
+    public Result<String> updateUserDetail(@RequestBody @ApiParam("Update User Info") MallUpdateUserParam mallUpdateUserParam,
                                            @TokenToMallUser MallUser mallUser) {
-        boolean flag = newBeeMallUserService.updateUserInfo(mallUpdateUser, mallUser.getUserId());
+        boolean flag = newBeeMallUserService.updateUserInfo(mallUpdateUserParam, mallUser.getUserId());
 
         if (flag) {
             return ResultGenerator.generateSuccessResult();
