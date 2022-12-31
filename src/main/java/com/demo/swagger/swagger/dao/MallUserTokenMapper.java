@@ -20,4 +20,7 @@ public interface MallUserTokenMapper {
 
     @Update("UPDATE tb_newbee_mall_user_token SET token = '${token}', update_time = '${updateTime}', expire_time = '${expireTime}' WHERE user_id = '${userId}'")
     int updateByPrimaryKeySelective(MallUserToken record);
+
+    @Select("SELECT * FROM tb_newbee_mall_user_token WHERE token = '${token}'")
+    MallUserToken selectByToken(String token);
 }

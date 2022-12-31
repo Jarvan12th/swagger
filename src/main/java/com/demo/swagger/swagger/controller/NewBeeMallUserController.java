@@ -1,7 +1,9 @@
 package com.demo.swagger.swagger.controller;
 
 import com.demo.swagger.swagger.common.Constants;
+import com.demo.swagger.swagger.config.annotation.TokenToMallUser;
 import com.demo.swagger.swagger.controller.param.MallUserLoginParam;
+import com.demo.swagger.swagger.entity.MallUser;
 import com.demo.swagger.swagger.entity.Result;
 import com.demo.swagger.swagger.service.NewBeeMallUserService;
 import com.demo.swagger.swagger.utils.ResultGenerator;
@@ -9,10 +11,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.StringUtils;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
@@ -38,5 +37,21 @@ public class NewBeeMallUserController {
         }
 
         return ResultGenerator.generateFailResult(loginResult);
+    }
+
+    @ApiOperation(value = "test1", notes = "test @TokenToMallUser")
+    @GetMapping("/test1")
+    public Result<String> test1(@TokenToMallUser MallUser mallUser) {
+        if (mallUser == null) {
+            return ResultGenerator.generateErrorResult(416, "Have not Logged in in yet");
+        } else {
+            return ResultGenerator.generateSuccessResult("Login passed");
+        }
+    }
+
+    @ApiOperation(value = "test2", notes = "test no @TokenToMallUser")
+    @GetMapping("/test2")
+    public Result<String> test2() {
+        return ResultGenerator.generateSuccessResult("Login passed");
     }
 }
