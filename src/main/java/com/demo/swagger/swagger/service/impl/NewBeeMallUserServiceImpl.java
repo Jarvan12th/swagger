@@ -79,6 +79,11 @@ public class NewBeeMallUserServiceImpl implements NewBeeMallUserService {
         return false;
     }
 
+    @Override
+    public boolean logout(Long userId) {
+        return mallUserTokenMapper.deleteByPrimaryKey(userId) > 0;
+    }
+
     private String getNewToken(Long userId) {
         return SystemUtils.generateToken(System.currentTimeMillis() + "" + userId + NumberUtils.generateRandomNumber(4));
     }

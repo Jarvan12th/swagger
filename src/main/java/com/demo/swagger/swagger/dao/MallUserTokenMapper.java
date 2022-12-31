@@ -23,4 +23,7 @@ public interface MallUserTokenMapper {
 
     @Select("SELECT * FROM tb_newbee_mall_user_token WHERE token = '${token}'")
     MallUserToken selectByToken(String token);
+
+    @Delete("DELETE FROM tb_newbee_mall_user_token WHERE user_id = '${userId}'")
+    int deleteByPrimaryKey(Long userId);
 }

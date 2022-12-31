@@ -80,4 +80,18 @@ public class NewBeeMallUserController {
             return ResultGenerator.generateFailResult("Update Fail");
         }
     }
+
+    @ApiOperation(value = "Logout", notes = "Log Out")
+    @PostMapping("/user/logout")
+    public Result<String> logout(@TokenToMallUser MallUser mallUser) {
+        boolean result = newBeeMallUserService.logout(mallUser.getUserId());
+
+        log.info("logout api, MallUser = {}", mallUser.getUserId());
+
+        if (result) {
+            return ResultGenerator.generateSuccessResult();
+        }
+
+        return ResultGenerator.generateFailResult("Logout Fail");
+    }
 }

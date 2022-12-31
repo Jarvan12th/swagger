@@ -6,4 +6,6 @@ public interface NewBeeMallUserService {
     String login(String loginName, String passwordMD5);
 
     boolean updateUserInfo(MallUpdateUser mallUpdateUser, Long userId);
+
+    boolean logout(Long userId);
 }
