@@ -15,6 +15,8 @@ public enum ServiceResultEnum {
 
     LOGIN_NAME_NULL("login name is required"),
 
+    LOGIN_NAME_IS_NOT_PHONE("login name should be phone"),
+
     LOGIN_PASSWORD_NULL("password is required"),
 
     LOGIN_VERIFY_CODE_NULL("verify code is required"),

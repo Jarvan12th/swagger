@@ -35,4 +35,20 @@ public interface MallUserMapper {
     @Update("UPDATE tb_newbee_mall_user SET nick_name = '${nickName}', password_md5 = '${passwordMD5}', " +
             "introduce_sign = '${introduceSign}' WHERE user_id = '${userId}'")
     int updateByPrimaryKey(MallUser mallUser);
+
+    @Insert("INSERT INTO tb_newbee_mall_user VALUES (null, '${nickName}', '${loginName}', '${passwordMD5}', '${introduceSign}', '${isDeleted}', '${lockedFlag}', '${createTime}')")
+    int insertSelective(MallUser mallUser);
+
+    @Results(id = "MallUserByLoginName", value = {
+            @Result(property = "userId", column = "user_id"),
+            @Result(property = "nickName", column = "nick_name"),
+            @Result(property = "loginName", column = "login_name"),
+            @Result(property = "passwordMD5", column = "password_md5"),
+            @Result(property = "introduceSign", column = "introduce_sign"),
+            @Result(property = "isDeleted", column = "is_deleted"),
+            @Result(property = "lockedFlag", column = "locked_flag"),
+            @Result(property = "createTime", column = "create_time")
+    })
+    @Select("SELECT * FROM tb_newbee_mall_user WHERE login_name = '${loginName}'")
+    MallUser selectByLoginName(String loginName);
 }

@@ -1,14 +1,17 @@
 package com.demo.swagger.swagger.controller;
 
 import com.demo.swagger.swagger.common.Constants;
+import com.demo.swagger.swagger.common.ServiceResultEnum;
 import com.demo.swagger.swagger.config.annotation.TokenToMallUser;
 import com.demo.swagger.swagger.controller.param.MallUpdateUserParam;
 import com.demo.swagger.swagger.controller.param.MallUserLoginParam;
+import com.demo.swagger.swagger.controller.param.MallUserRegisterParam;
 import com.demo.swagger.swagger.controller.vo.NewBeeMallUserVO;
 import com.demo.swagger.swagger.entity.MallUser;
 import com.demo.swagger.swagger.entity.Result;
 import com.demo.swagger.swagger.service.NewBeeMallUserService;
 import com.demo.swagger.swagger.utils.BeanUtils;
+import com.demo.swagger.swagger.utils.NumberUtils;
 import com.demo.swagger.swagger.utils.ResultGenerator;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -93,5 +96,23 @@ public class NewBeeMallUserController {
         }
 
         return ResultGenerator.generateFailResult("Logout Fail");
+    }
+
+    @ApiOperation(value = "User Register", notes = "User Register")
+    @PostMapping("/user/register")
+    public Result<String> register(@RequestBody @Valid MallUserRegisterParam mallUserRegisterParam) {
+        if (!NumberUtils.isPhone(mallUserRegisterParam.getLoginName())) {
+            return ResultGenerator.generateFailResult(ServiceResultEnum.LOGIN_NAME_IS_NOT_PHONE.getResult());
+        }
+
+        String result = newBeeMallUserService.register(mallUserRegisterParam.getLoginName(), mallUserRegisterParam.getPassword());
+
+        log.info("register api, loginName = {}, result = {}", mallUserRegisterParam.getLoginName(), result);
+
+        if (ServiceResultEnum.SUCCESS.getResult().equals(result)) {
+            return ResultGenerator.generateSuccessResult();
+        }
+
+        return ResultGenerator.generateFailResult(result);
     }
 }

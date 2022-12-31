@@ -8,4 +8,6 @@ public interface NewBeeMallUserService {
     boolean updateUserInfo(MallUpdateUserParam mallUpdateUserParam, Long userId);
 
     boolean logout(Long userId);
+
+    String register(String loginName, String password);
 }
