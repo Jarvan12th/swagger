@@ -31,4 +31,8 @@ public interface MallUserMapper {
     })
     @Select("SELECT * FROM tb_newbee_mall_user WHERE user_id = '${userId}'")
     MallUser selectByPrimaryKey(@Param("userId") Long userId);
+
+    @Update("UPDATE tb_newbee_mall_user SET nick_name = '${nickName}', password_md5 = '${passwordMD5}', " +
+            "introduce_sign = '${introduceSign}' WHERE user_id = '${userId}'")
+    int updateByPrimaryKey(MallUser mallUser);
 }

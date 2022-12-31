@@ -3,12 +3,16 @@ package com.demo.swagger.swagger.controller;
 import com.demo.swagger.swagger.common.Constants;
 import com.demo.swagger.swagger.config.annotation.TokenToMallUser;
 import com.demo.swagger.swagger.controller.param.MallUserLoginParam;
+import com.demo.swagger.swagger.controller.vo.NewBeeMallUserVO;
+import com.demo.swagger.swagger.entity.MallUpdateUser;
 import com.demo.swagger.swagger.entity.MallUser;
 import com.demo.swagger.swagger.entity.Result;
 import com.demo.swagger.swagger.service.NewBeeMallUserService;
+import com.demo.swagger.swagger.utils.BeanUtils;
 import com.demo.swagger.swagger.utils.ResultGenerator;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
@@ -53,5 +57,27 @@ public class NewBeeMallUserController {
     @GetMapping("/test2")
     public Result<String> test2() {
         return ResultGenerator.generateSuccessResult("Login passed");
+    }
+
+    @ApiOperation(value = "Get User Detail", notes = "Get User Detail")
+    @GetMapping("/user/info")
+    public Result<NewBeeMallUserVO> getUserDetail(@TokenToMallUser MallUser mallUser) {
+        NewBeeMallUserVO newBeeMallUserVO = new NewBeeMallUserVO();
+        BeanUtils.copyProperties(mallUser, newBeeMallUserVO);
+
+        return ResultGenerator.generateSuccessResult(newBeeMallUserVO);
+    }
+
+    @ApiOperation(value = "Update User Detail", notes = "Update User Detail")
+    @PutMapping("/user/info")
+    public Result<String> updateUserDetail(@RequestBody @ApiParam("Update User Info") MallUpdateUser mallUpdateUser,
+                                           @TokenToMallUser MallUser mallUser) {
+        boolean flag = newBeeMallUserService.updateUserInfo(mallUpdateUser, mallUser.getUserId());
+
+        if (flag) {
+            return ResultGenerator.generateSuccessResult();
+        } else {
+            return ResultGenerator.generateFailResult("Update Fail");
+        }
     }
 }

@@ -3,6 +3,7 @@ package com.demo.swagger.swagger.service.impl;
 import com.demo.swagger.swagger.common.ServiceResultEnum;
 import com.demo.swagger.swagger.dao.MallUserMapper;
 import com.demo.swagger.swagger.dao.MallUserTokenMapper;
+import com.demo.swagger.swagger.entity.MallUpdateUser;
 import com.demo.swagger.swagger.entity.MallUser;
 import com.demo.swagger.swagger.entity.MallUserToken;
 import com.demo.swagger.swagger.service.NewBeeMallUserService;
@@ -59,6 +60,23 @@ public class NewBeeMallUserServiceImpl implements NewBeeMallUserService {
         }
 
         return ServiceResultEnum.LOGIN_ERROR.getResult();
+    }
+
+    @Override
+    public boolean updateUserInfo(MallUpdateUser mallUpdateUser, Long userId) {
+        MallUser mallUser = mallUserMapper.selectByPrimaryKey(userId);
+        if (mallUser == null) {
+            return false;
+        }
+
+        mallUser.setNickName(mallUpdateUser.getNickName());
+        mallUser.setPasswordMD5(mallUpdateUser.getPasswordMD5());
+        mallUser.setIntroduceSign(mallUpdateUser.getIntroduceSign());
+        if (mallUserMapper.updateByPrimaryKey(mallUser) > 0) {
+            return true;
+        }
+
+        return false;
     }
 
     private String getNewToken(Long userId) {
