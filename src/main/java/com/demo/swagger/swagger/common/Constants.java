@@ -13,4 +13,9 @@ public interface Constants {
     public final static int INDEX_GOODS_RECOMMENDATION_NUMBER = 10;
 
     public final static int INDEX_CATEGORY_NUMBER = 10;
+
+    public final static int GOODS_SEARCH_PAGE_LIMIT = 10;
+
+    public final static byte SELL_STATUS_UP = 0;
+    public final static byte SELL_STATUS_DOWN = 1;
 }
