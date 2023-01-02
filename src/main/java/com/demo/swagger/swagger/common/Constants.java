@@ -11,4 +11,6 @@ public interface Constants {
     public final static int INDEX_GOODS_HOT_NUMBER = 4;
     public final static int INDEX_GOODS_NEW_NUMBER = 5;
     public final static int INDEX_GOODS_RECOMMENDATION_NUMBER = 10;
+
+    public final static int INDEX_CATEGORY_NUMBER = 10;
 }
