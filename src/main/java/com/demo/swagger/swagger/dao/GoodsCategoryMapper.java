@@ -38,7 +38,9 @@ public interface GoodsCategoryMapper {
                 FROM("tb_newbee_mall_goods_category");
                 WHERE("parent_id in (" + parentIdsStr + ") and category_level = " + level + " and is_deleted = 0");
                 ORDER_BY("category_rank desc");
-                LIMIT(number);
+                if (number > 0) {
+                    LIMIT(number);
+                }
             }}.toString();
         }
     }
