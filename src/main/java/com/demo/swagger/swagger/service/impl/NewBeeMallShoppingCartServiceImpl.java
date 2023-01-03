@@ -5,20 +5,25 @@ import com.demo.swagger.swagger.common.NewBeeMallException;
 import com.demo.swagger.swagger.common.ServiceResultEnum;
 import com.demo.swagger.swagger.controller.param.SaveCartItemParam;
 import com.demo.swagger.swagger.controller.param.UpdateCartItemParam;
+import com.demo.swagger.swagger.controller.vo.NewBeeMallShoppingCartItemVO;
 import com.demo.swagger.swagger.dao.NewBeeMallGoodsMapper;
 import com.demo.swagger.swagger.dao.NewBeeMallShoppingCartItemMapper;
 import com.demo.swagger.swagger.entity.MallUser;
 import com.demo.swagger.swagger.entity.NewBeeMallGoods;
 import com.demo.swagger.swagger.entity.NewBeeMallShoppingCartItem;
 import com.demo.swagger.swagger.service.NewBeeMallShoppingCartService;
-import com.demo.swagger.swagger.utils.ResultGenerator;
+import com.demo.swagger.swagger.utils.PageQueryUtils;
+import com.demo.swagger.swagger.utils.PageResult;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 public class NewBeeMallShoppingCartServiceImpl implements NewBeeMallShoppingCartService {
@@ -96,6 +101,46 @@ public class NewBeeMallShoppingCartServiceImpl implements NewBeeMallShoppingCart
         }
 
         return ServiceResultEnum.OPERATE_ERROR.getResult();
+    }
+
+    @Override
+    public PageResult getMyShoppingCartItems(PageQueryUtils pageQueryUtils) {
+        List<NewBeeMallShoppingCartItem> newBeeMallShoppingCartItems = newBeeMallShoppingCartItemMapper.findMyNewBeeCartItems(pageQueryUtils);
+        int total = newBeeMallShoppingCartItemMapper.getTotalMyNewBeeMallCartItems(pageQueryUtils);
+
+        List<NewBeeMallShoppingCartItemVO> newBeeMallShoppingCartItemVOS = getNewBeeMallShoppingCartItemVOS(newBeeMallShoppingCartItems);
+        return new PageResult(newBeeMallShoppingCartItemVOS, total, pageQueryUtils.getLimit(), pageQueryUtils.getPage());
+    }
+
+    private List<NewBeeMallShoppingCartItemVO> getNewBeeMallShoppingCartItemVOS(List<NewBeeMallShoppingCartItem> newBeeMallShoppingCartItems) {
+        List<NewBeeMallShoppingCartItemVO> newBeeMallShoppingCartItemVOS = new ArrayList<>();
+        if (!CollectionUtils.isEmpty(newBeeMallShoppingCartItems)) {
+            List<Long> goodsIds = newBeeMallShoppingCartItems.stream().map(NewBeeMallShoppingCartItem::getGoodsId).collect(Collectors.toList());
+            List<NewBeeMallGoods> newBeeMallGoods = newBeeMallGoodsMapper.selectGoodsByPrimaryKeys(goodsIds);
+
+            Map<Long, NewBeeMallGoods> newBeeMallGoodsMap = new HashMap<>();
+            if (!CollectionUtils.isEmpty(newBeeMallGoods)) {
+                newBeeMallGoodsMap = newBeeMallGoods.stream().collect(Collectors.toMap(NewBeeMallGoods::getGoodsId, Function.identity(), (entity1, entity2) -> entity1));
+            }
+
+            for (NewBeeMallShoppingCartItem newBeeMallShoppingCartItem : newBeeMallShoppingCartItems) {
+                NewBeeMallShoppingCartItemVO newBeeMallShoppingCartItemVO = new NewBeeMallShoppingCartItemVO();
+                BeanUtils.copyProperties(newBeeMallShoppingCartItem, newBeeMallShoppingCartItemVO);
+                if (newBeeMallGoodsMap.containsKey(newBeeMallShoppingCartItem.getGoodsId())) {
+                    NewBeeMallGoods temp = newBeeMallGoodsMap.get(newBeeMallShoppingCartItem.getGoodsId());
+                    newBeeMallShoppingCartItemVO.setGoodsCoverImg(temp.getGoodsCoverImg());
+                    String goodsName = temp.getGoodsName();
+                    if (goodsName.length() > 28) {
+                        goodsName = goodsName.substring(0, 28) + "...";
+                    }
+                    newBeeMallShoppingCartItemVO.setGoodsName(goodsName);
+                    newBeeMallShoppingCartItemVO.setSellingPrice(temp.getSellingPrice());
+                    newBeeMallShoppingCartItemVOS.add(newBeeMallShoppingCartItemVO);
+                }
+            }
+        }
+
+        return newBeeMallShoppingCartItemVOS;
     }
 
     public NewBeeMallShoppingCartItem getNewBeeMallCartItemById(Long cartItemId) {
