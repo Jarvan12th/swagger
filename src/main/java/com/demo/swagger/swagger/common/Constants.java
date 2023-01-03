@@ -18,4 +18,7 @@ public interface Constants {
 
     public final static byte SELL_STATUS_UP = 0;
     public final static byte SELL_STATUS_DOWN = 1;
+
+    public final static int SHOPPING_CART_ITEM_TOTAL_NUMBER = 20;
+    public final static int SHOPPING_CART_ITEM_LIMIT_NUMBER = 5;
 }
