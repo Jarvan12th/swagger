@@ -87,6 +87,9 @@ public interface NewBeeMallShoppingCartItemMapper {
     @SelectProvider(type = NewBeeCartItemsProviderBuilder.class, method = "buildSelectByUserIdAndCartItemIds")
     List<NewBeeMallShoppingCartItem> selectByUserIdAndCartItemIds(List<Long> cartItemIds, Long userId);
 
+    @UpdateProvider(type = NewBeeCartItemsProviderBuilder.class, method = "buildBatchDelete")
+    int batchDelete(@Param("cartItemIds") List<Long> cartItemIds);
+
     class NewBeeCartItemsProviderBuilder {
         public static String buildSelectByUserIdAndCartItemIds(final List<Long> cartItemIds, final Long userId) {
             String cartItemIdsStr = cartItemIds.stream().map(Objects::toString).collect(Collectors.joining(","));
@@ -95,6 +98,16 @@ public interface NewBeeMallShoppingCartItemMapper {
                 SELECT("*");
                 FROM("tb_newbee_mall_shopping_cart_item");
                 WHERE("user_id = " + userId + " AND cart_item_id in (" + cartItemIdsStr + ") AND is_deleted = 0");
+            }}.toString();
+        }
+
+        public static String buildBatchDelete(final List<Long> cartItemIds) {
+            String cartItemIdsStr = cartItemIds.stream().map(Objects::toString).collect(Collectors.joining(","));
+
+            return new SQL() {{
+                UPDATE("tb_newbee_mall_shopping_cart_item");
+                SET("is_deleted = 1");
+                WHERE("cart_item_id in (" + cartItemIdsStr + ")");
             }}.toString();
         }
     }

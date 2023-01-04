@@ -14,4 +14,11 @@ public class NumberUtils {
         Pattern pattern = Pattern.compile("^((13[0-9])|(14[5,7])|(15[^4,\\D])|(17[0-8])|(18[0-9]))\\d{8}$");
         return pattern.matcher(loginName).matches();
     }
+
+    public static String generateOrderNo() {
+        StringBuffer buffer = new StringBuffer(String.valueOf(System.currentTimeMillis()));
+        buffer.append(generateRandomNumber(4));
+
+        return buffer.toString();
+    }
 }

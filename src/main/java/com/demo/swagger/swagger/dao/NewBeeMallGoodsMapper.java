@@ -1,5 +1,6 @@
 package com.demo.swagger.swagger.dao;
 
+import com.demo.swagger.swagger.entity.GoodsStock;
 import com.demo.swagger.swagger.entity.NewBeeMallGoods;
 import com.demo.swagger.swagger.utils.PageQueryUtils;
 import org.apache.ibatis.annotations.*;
@@ -77,6 +78,9 @@ public interface NewBeeMallGoodsMapper {
     @Select("SELECT * FROM tb_newbee_mall_goods_info WHERE goods_id = ${goodsId}")
     NewBeeMallGoods selectByPrimaryKey(Long goodsId);
 
+    @UpdateProvider(type = GoodsProviderBuilder.class, method = "buildUpdateGoodsStock")
+    int updateGoodsStock(@Param("goodsStocks") List<GoodsStock> goodsStocks);
+
     class GoodsProviderBuilder {
         public static String buildSelectGoodsByPrimaryKeys(final List<Long> goodIds) {
             String goodIdsStr = goodIds.stream().map(Object::toString).collect(Collectors.joining(","));
@@ -120,6 +124,21 @@ public interface NewBeeMallGoodsMapper {
                     WHERE(whereClause);
                 }
             }}.toString();
+        }
+
+        public static String buildUpdateGoodsStock(final List<GoodsStock> goodsStocks) {
+            StringBuilder sb = new StringBuilder();
+            for (GoodsStock goodsStock : goodsStocks) {
+                sb.append(new SQL(){{
+                    UPDATE("tb_newbee_mall_goods_info");
+                    SET("stock_num = stock_num - " + goodsStock.getGoodsCount());
+                    WHERE("goods_id = " + goodsStock.getGoodsId() +
+                            " AND stock_num >= " + goodsStock.getGoodsCount() + " AND goods_sell_status = 0");
+                }});
+                sb.append(";");
+            }
+
+            return sb.toString();
         }
 
         private static String getLimitClause(PageQueryUtils pageQueryUtils) {
