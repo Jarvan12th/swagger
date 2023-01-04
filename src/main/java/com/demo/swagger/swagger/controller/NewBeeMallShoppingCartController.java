@@ -45,6 +45,14 @@ public class NewBeeMallShoppingCartController {
         return ResultGenerator.generateSuccessResult(pageResult);
     }
 
+    @ApiOperation(value = "List Cart Item", notes = "List Cart Item")
+    @GetMapping("/shop-cart")
+    public Result<List<NewBeeMallShoppingCartItemVO>> cartItemList(@TokenToMallUser MallUser mallUser) {
+        List<NewBeeMallShoppingCartItemVO> newBeeMallShoppingCartItemVOS = newBeeMallShoppingCartService.getMyShoppingCartItems(mallUser.getUserId());
+
+        return ResultGenerator.generateSuccessResult(newBeeMallShoppingCartItemVOS);
+    }
+
     @ApiOperation(value = "Save Goods to Cart", notes = "Save Goods to Cart")
     @PostMapping("/shop-cart")
     public Result saveNewBeeMallShoppingCartItem(@RequestBody SaveCartItemParam saveCartItemParam,

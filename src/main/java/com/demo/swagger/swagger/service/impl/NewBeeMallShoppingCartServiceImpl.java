@@ -112,6 +112,13 @@ public class NewBeeMallShoppingCartServiceImpl implements NewBeeMallShoppingCart
         return new PageResult(newBeeMallShoppingCartItemVOS, total, pageQueryUtils.getLimit(), pageQueryUtils.getPage());
     }
 
+    @Override
+    public List<NewBeeMallShoppingCartItemVO> getMyShoppingCartItems(Long userId) {
+        List<NewBeeMallShoppingCartItem> newBeeMallShoppingCartItems =
+                newBeeMallShoppingCartItemMapper.selectByUserId(userId, Constants.SHOPPING_CART_ITEM_TOTAL_NUMBER);
+        return getNewBeeMallShoppingCartItemVOS(newBeeMallShoppingCartItems);
+    }
+
     private List<NewBeeMallShoppingCartItemVO> getNewBeeMallShoppingCartItemVOS(List<NewBeeMallShoppingCartItem> newBeeMallShoppingCartItems) {
         List<NewBeeMallShoppingCartItemVO> newBeeMallShoppingCartItemVOS = new ArrayList<>();
         if (!CollectionUtils.isEmpty(newBeeMallShoppingCartItems)) {

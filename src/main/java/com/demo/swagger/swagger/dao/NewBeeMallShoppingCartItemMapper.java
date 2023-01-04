@@ -59,4 +59,16 @@ public interface NewBeeMallShoppingCartItemMapper {
 
     @Select("SELECT count(*) FROM tb_newbee_mall_shopping_cart_item WHERE user_id = ${userId} AND is_deleted = 0")
     int getTotalMyNewBeeMallCartItems(PageQueryUtils pageQueryUtils);
+
+    @Results(id = "NewBeeCartItemsByUserId", value = {
+            @Result(property = "cartItemId", column = "cart_item_id"),
+            @Result(property = "userId", column = "user_id"),
+            @Result(property = "goodsId", column = "goods_id"),
+            @Result(property = "goodsCount", column = "goods_count"),
+            @Result(property = "isDeleted", column = "is_deleted"),
+            @Result(property = "createTime", column = "create_time"),
+            @Result(property = "updateTime", column = "update_time")
+    })
+    @Select("SELECT * FROM tb_newbee_mall_shopping_cart_item WHERE user_id = ${userId} AND is_deleted = 0 limit ${number}")
+    List<NewBeeMallShoppingCartItem> selectByUserId(Long userId, int number);
 }
