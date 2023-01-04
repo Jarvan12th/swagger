@@ -3,8 +3,11 @@ package com.demo.swagger.swagger.dao;
 import com.demo.swagger.swagger.entity.NewBeeMallShoppingCartItem;
 import com.demo.swagger.swagger.utils.PageQueryUtils;
 import org.apache.ibatis.annotations.*;
+import org.apache.ibatis.jdbc.SQL;
 
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Mapper
 public interface NewBeeMallShoppingCartItemMapper {
@@ -71,4 +74,28 @@ public interface NewBeeMallShoppingCartItemMapper {
     })
     @Select("SELECT * FROM tb_newbee_mall_shopping_cart_item WHERE user_id = ${userId} AND is_deleted = 0 limit ${number}")
     List<NewBeeMallShoppingCartItem> selectByUserId(Long userId, int number);
+
+    @Results(id = "NewBeeCartItemsByUserIdAndCartItemIds", value = {
+            @Result(property = "cartItemId", column = "cart_item_id"),
+            @Result(property = "userId", column = "user_id"),
+            @Result(property = "goodsId", column = "goods_id"),
+            @Result(property = "goodsCount", column = "goods_count"),
+            @Result(property = "isDeleted", column = "is_deleted"),
+            @Result(property = "createTime", column = "create_time"),
+            @Result(property = "updateTime", column = "update_time")
+    })
+    @SelectProvider(type = NewBeeCartItemsProviderBuilder.class, method = "buildSelectByUserIdAndCartItemIds")
+    List<NewBeeMallShoppingCartItem> selectByUserIdAndCartItemIds(List<Long> cartItemIds, Long userId);
+
+    class NewBeeCartItemsProviderBuilder {
+        public static String buildSelectByUserIdAndCartItemIds(final List<Long> cartItemIds, final Long userId) {
+            String cartItemIdsStr = cartItemIds.stream().map(Objects::toString).collect(Collectors.joining(","));
+
+            return new SQL(){{
+                SELECT("*");
+                FROM("tb_newbee_mall_shopping_cart_item");
+                WHERE("user_id = " + userId + " AND cart_item_id in (" + cartItemIdsStr + ") AND is_deleted = 0");
+            }}.toString();
+        }
+    }
 }

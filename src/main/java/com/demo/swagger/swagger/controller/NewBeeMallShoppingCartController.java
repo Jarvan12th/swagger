@@ -1,6 +1,7 @@
 package com.demo.swagger.swagger.controller;
 
 import com.demo.swagger.swagger.common.Constants;
+import com.demo.swagger.swagger.common.NewBeeMallException;
 import com.demo.swagger.swagger.common.ServiceResultEnum;
 import com.demo.swagger.swagger.config.annotation.TokenToMallUser;
 import com.demo.swagger.swagger.controller.param.SaveCartItemParam;
@@ -14,9 +15,11 @@ import com.demo.swagger.swagger.utils.PageResult;
 import com.demo.swagger.swagger.utils.ResultGenerator;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -89,5 +92,29 @@ public class NewBeeMallShoppingCartController {
         }
 
         return ResultGenerator.generateFailResult(deleteResult);
+    }
+
+    @ApiOperation(value = "Get Cart Item Detail", notes = "Get Cart Item Detail")
+    @GetMapping("/shop-cart/settle")
+    public Result<List<NewBeeMallShoppingCartItemVO>> toSettle(Long[] cartItemIds, @TokenToMallUser MallUser mallUser) {
+        if (cartItemIds.length < 1) {
+            NewBeeMallException.fail("invalid parameters");
+        }
+        List<NewBeeMallShoppingCartItemVO> newBeeMallShoppingCartItemVOS =
+                newBeeMallShoppingCartService.getCartItemsForSettle(Arrays.asList(cartItemIds), mallUser.getUserId());
+
+        if (CollectionUtils.isEmpty(newBeeMallShoppingCartItemVOS)) {
+            NewBeeMallException.fail("invalid parameters");
+        }
+
+        int priceTotal = 0;
+        for (NewBeeMallShoppingCartItemVO newBeeMallShoppingCartItemVO : newBeeMallShoppingCartItemVOS) {
+            priceTotal += newBeeMallShoppingCartItemVO.getGoodsCount() * newBeeMallShoppingCartItemVO.getSellingPrice();
+        }
+        if (priceTotal <= 0) {
+            NewBeeMallException.fail("price error");
+        }
+
+        return ResultGenerator.generateSuccessResult(newBeeMallShoppingCartItemVOS);
     }
 }

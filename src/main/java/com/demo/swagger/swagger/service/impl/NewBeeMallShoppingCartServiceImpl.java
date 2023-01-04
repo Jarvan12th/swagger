@@ -119,6 +119,19 @@ public class NewBeeMallShoppingCartServiceImpl implements NewBeeMallShoppingCart
         return getNewBeeMallShoppingCartItemVOS(newBeeMallShoppingCartItems);
     }
 
+    @Override
+    public List<NewBeeMallShoppingCartItemVO> getCartItemsForSettle(List<Long> cartItemIds, Long userId) {
+        List<NewBeeMallShoppingCartItem> newBeeMallShoppingCartItems = newBeeMallShoppingCartItemMapper.selectByUserIdAndCartItemIds(cartItemIds, userId);
+        if (CollectionUtils.isEmpty(newBeeMallShoppingCartItems)) {
+            NewBeeMallException.fail("cart item should not be null");
+        }
+        if (newBeeMallShoppingCartItems.size() != cartItemIds.size()) {
+            NewBeeMallException.fail("invalid parameters");
+        }
+
+        return getNewBeeMallShoppingCartItemVOS(newBeeMallShoppingCartItems);
+    }
+
     private List<NewBeeMallShoppingCartItemVO> getNewBeeMallShoppingCartItemVOS(List<NewBeeMallShoppingCartItem> newBeeMallShoppingCartItems) {
         List<NewBeeMallShoppingCartItemVO> newBeeMallShoppingCartItemVOS = new ArrayList<>();
         if (!CollectionUtils.isEmpty(newBeeMallShoppingCartItems)) {

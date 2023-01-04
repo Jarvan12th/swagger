@@ -20,4 +20,6 @@ public interface NewBeeMallShoppingCartService {
     PageResult getMyShoppingCartItems(PageQueryUtils pageQueryUtils);
 
     List<NewBeeMallShoppingCartItemVO> getMyShoppingCartItems(Long userId);
+
+    List<NewBeeMallShoppingCartItemVO> getCartItemsForSettle(List<Long> cartItemIds, Long userId);
 }
