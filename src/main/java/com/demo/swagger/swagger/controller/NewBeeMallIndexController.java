@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.annotation.Resource;
 
 @RestController
-@Api(value = "v1", tags = "NewBee Mall Index API")
+@Api(value = "v1", tags = "Index API")
 @RequestMapping("/api/v1")
 public class NewBeeMallIndexController {
 

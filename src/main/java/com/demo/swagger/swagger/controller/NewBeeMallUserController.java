@@ -24,7 +24,7 @@ import javax.annotation.Resource;
 import javax.validation.Valid;
 
 @RestController
-@Api(value = "v1", tags = "NewBee Mall User Related Api")
+@Api(value = "v1", tags = "User Related Api")
 @RequestMapping("/api/v1")
 @Slf4j
 public class NewBeeMallUserController {
