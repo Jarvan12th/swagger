@@ -1,20 +1,26 @@
 package com.demo.swagger.swagger.service.impl;
 
-import com.demo.swagger.swagger.common.Constants;
-import com.demo.swagger.swagger.common.NewBeeMallException;
-import com.demo.swagger.swagger.common.ServiceResultEnum;
+import com.demo.swagger.swagger.common.*;
+import com.demo.swagger.swagger.controller.vo.NewBeeMallOrderDetailVO;
+import com.demo.swagger.swagger.controller.vo.NewBeeMallOrderItemVO;
+import com.demo.swagger.swagger.controller.vo.NewBeeMallOrderListVO;
 import com.demo.swagger.swagger.controller.vo.NewBeeMallShoppingCartItemVO;
 import com.demo.swagger.swagger.dao.*;
 import com.demo.swagger.swagger.entity.*;
 import com.demo.swagger.swagger.service.NewBeeMallOrderService;
 import com.demo.swagger.swagger.utils.BeanUtils;
 import com.demo.swagger.swagger.utils.NumberUtils;
+import com.demo.swagger.swagger.utils.PageQueryUtils;
+import com.demo.swagger.swagger.utils.PageResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -108,5 +114,89 @@ public class NewBeeMallOrderServiceImpl implements NewBeeMallOrderService {
         }
         NewBeeMallException.fail(ServiceResultEnum.SHOPPING_ITEM_ERROR.getResult());
         return ServiceResultEnum.SHOPPING_ITEM_ERROR.getResult();
+    }
+
+    @Override
+    public String paySuccess(String orderNo, int payType) {
+        NewBeeMallOrder newBeeMallOrder = newBeeMallOrderMapper.selectByOrderNo(orderNo);
+        if (newBeeMallOrder != null) {
+            if (newBeeMallOrder.getOrderStatus().intValue() != NewBeeMallOrderStatusEnum.ORDER_PRE_PAY.getOrderStatus()) {
+                NewBeeMallException.fail("pay forbidden");
+            }
+
+            newBeeMallOrder.setOrderStatus((byte) NewBeeMallOrderStatusEnum.ORDER_PAID.getOrderStatus());
+            newBeeMallOrder.setPayType((byte) payType);
+            newBeeMallOrder.setPayStatus((byte) PayStatusEnum.PAY_SUCCESS.getPayStatus());
+
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            Date now = new Date();
+            newBeeMallOrder.setPayTime(Timestamp.valueOf(simpleDateFormat.format(now)));
+            newBeeMallOrder.setUpdateTime(Timestamp.valueOf(simpleDateFormat.format(now)));
+
+            if (newBeeMallOrderMapper.updateByPrimaryKeySelective(newBeeMallOrder) > 0) {
+                return ServiceResultEnum.SUCCESS.getResult();
+            }
+
+            return ServiceResultEnum.DB_ERROR.getResult();
+        }
+
+        return ServiceResultEnum.ORDER_NOT_EXIST_ERROR.getResult();
+    }
+
+    @Override
+    public NewBeeMallOrderDetailVO getOrderDetailByOrderNo(String orderNo, Long userId) {
+        NewBeeMallOrder newBeeMallOrder = newBeeMallOrderMapper.selectByOrderNo(orderNo);
+        if (newBeeMallOrder == null) {
+            NewBeeMallException.fail(ServiceResultEnum.DATA_NOT_EXIST.getResult());
+        }
+        if (!userId.equals(newBeeMallOrder.getUserId())) {
+            NewBeeMallException.fail(ServiceResultEnum.REQUEST_FORBIDEN_ERROR.getResult());
+        }
+
+        List<NewBeeMallOrderItem> orderItems = newBeeMallOrderItemMapper.selectByOrderId(newBeeMallOrder.getOrderId());
+        if (!CollectionUtils.isEmpty(orderItems)) {
+            NewBeeMallOrderDetailVO newBeeMallOrderDetailVO = new NewBeeMallOrderDetailVO();
+            BeanUtils.copyProperties(newBeeMallOrder, newBeeMallOrderDetailVO);
+            newBeeMallOrderDetailVO.setOrderStatusString(NewBeeMallOrderStatusEnum.getNewBeeMallOrderStatusEnumByStatus(newBeeMallOrderDetailVO.getOrderStatus()).getName());
+            newBeeMallOrderDetailVO.setPayTypeString(PayTypeEnum.getPayTypeEnumByType(newBeeMallOrderDetailVO.getPayType()).getName());
+
+            List<NewBeeMallOrderItemVO> newBeeMallOrderItemVOS = BeanUtils.copyList(orderItems, NewBeeMallOrderItemVO.class);
+            newBeeMallOrderDetailVO.setNewBeeMallOrderItemVOS(newBeeMallOrderItemVOS);
+
+            return newBeeMallOrderDetailVO;
+        }
+
+        NewBeeMallException.fail(ServiceResultEnum.ORDER_ITEM_NULL_ERROR.getResult());
+        return null;
+    }
+
+    @Override
+    public PageResult getMyOrders(PageQueryUtils pageQueryUtils) {
+        int total = newBeeMallOrderMapper.getTotalNewBeeMallOrders(pageQueryUtils);
+
+        List<NewBeeMallOrder> newBeeMallOrders = newBeeMallOrderMapper.findNewBeeMallOrderList(pageQueryUtils);
+        List<NewBeeMallOrderListVO> newBeeMallOrderListVOS = new ArrayList<>();
+        if (total > 0) {
+            newBeeMallOrderListVOS = BeanUtils.copyList(newBeeMallOrders, NewBeeMallOrderListVO.class);
+            for (NewBeeMallOrderListVO newBeeMallOrderListVO : newBeeMallOrderListVOS) {
+                newBeeMallOrderListVO.setOrderStatusString(NewBeeMallOrderStatusEnum.getNewBeeMallOrderStatusEnumByStatus(newBeeMallOrderListVO.getOrderStatus()).name());
+            }
+
+            List<Long> orderIds = newBeeMallOrders.stream().map(NewBeeMallOrder::getOrderId).collect(Collectors.toList());
+            if (!CollectionUtils.isEmpty(orderIds)) {
+                List<NewBeeMallOrderItem> newBeeMallOrderItems = newBeeMallOrderItemMapper.selectByOrderIds(orderIds);
+
+                Map<Long, List<NewBeeMallOrderItem>> itemByOrderIdMap = newBeeMallOrderItems.stream().collect(Collectors.groupingBy(NewBeeMallOrderItem::getOrderId));
+                for (NewBeeMallOrderListVO newBeeMallOrderListVO : newBeeMallOrderListVOS) {
+                    if (itemByOrderIdMap.containsKey(newBeeMallOrderListVO.getOrderId())) {
+                        List<NewBeeMallOrderItem> temp = itemByOrderIdMap.get(newBeeMallOrderListVO.getOrderId());
+                        List<NewBeeMallOrderItemVO> newBeeMallOrderListVOList = BeanUtils.copyList(temp, NewBeeMallOrderItemVO.class);
+                        newBeeMallOrderListVO.setNewBeeMallOrderItemVOS(newBeeMallOrderListVOList);
+                    }
+                }
+            }
+        }
+
+        return new PageResult(newBeeMallOrderListVOS, total, pageQueryUtils.getLimit(), pageQueryUtils.getPage());
     }
 }

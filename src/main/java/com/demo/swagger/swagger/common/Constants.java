@@ -22,4 +22,6 @@ public interface Constants {
 
     public final static int SHOPPING_CART_ITEM_TOTAL_NUMBER = 20;
     public final static int SHOPPING_CART_ITEM_LIMIT_NUMBER = 5;
+
+    public final static int ORDER_SEARCH_PAGE_LIMIT = 5;
 }
