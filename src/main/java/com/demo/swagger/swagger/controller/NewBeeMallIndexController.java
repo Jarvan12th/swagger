@@ -35,6 +35,6 @@ public class NewBeeMallIndexController {
         indexInfoVO.setNewGoods(newBeeMallIndexConfigService.getConfigGoodsForIndex(IndexConfigTypeEnum.INDEX_GOODS_NEW.getType(), Constants.INDEX_GOODS_NEW_NUMBER));
         indexInfoVO.setRecommendedGoods(newBeeMallIndexConfigService.getConfigGoodsForIndex(IndexConfigTypeEnum.INDEX_GOODS_RECOMMENDATION.getType(), Constants.INDEX_GOODS_RECOMMENDATION_NUMBER));
 
-        return ResultGenerator.generateSuccessResult(indexInfoVO);
+        return ResultGenerator.generateSuccessResultWithData(indexInfoVO);
     }
 }

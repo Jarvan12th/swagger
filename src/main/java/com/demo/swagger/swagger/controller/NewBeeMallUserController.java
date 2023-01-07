@@ -40,7 +40,7 @@ public class NewBeeMallUserController {
         log.info("login api, loginName = {}, loginResult = {}", mallUserLoginParam.getLoginName(), loginResult);
 
         if (!StringUtils.isEmpty(loginResult) && loginResult.length() == Constants.TOKEN_LENGTH) {
-            return ResultGenerator.generateSuccessResult(loginResult);
+            return ResultGenerator.generateSuccessResultWithData(loginResult);
         }
 
         return ResultGenerator.generateFailResult(loginResult);
@@ -68,7 +68,7 @@ public class NewBeeMallUserController {
         NewBeeMallUserVO newBeeMallUserVO = new NewBeeMallUserVO();
         BeanUtils.copyProperties(mallUser, newBeeMallUserVO);
 
-        return ResultGenerator.generateSuccessResult(newBeeMallUserVO);
+        return ResultGenerator.generateSuccessResultWithData(newBeeMallUserVO);
     }
 
     @ApiOperation(value = "Update User Detail", notes = "Update User Detail")

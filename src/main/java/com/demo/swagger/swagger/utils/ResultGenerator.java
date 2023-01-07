@@ -17,7 +17,7 @@ public class ResultGenerator {
         return new Result(RESULT_CODE_SUCCESS, message);
     }
 
-    public static Result generateSuccessResult(Object data) {
+    public static Result generateSuccessResultWithData(Object data) {
         return new Result(RESULT_CODE_SUCCESS, DEFAULT_SUCCESS_MESSAGE, data);
     }
 

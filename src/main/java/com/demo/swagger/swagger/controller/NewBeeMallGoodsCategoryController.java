@@ -32,6 +32,6 @@ public class NewBeeMallGoodsCategoryController {
             NewBeeMallException.fail(ServiceResultEnum.DATA_NOT_EXIST.getResult());
         }
 
-        return ResultGenerator.generateSuccessResult(newBeeMallIndexCategoryVOS);
+        return ResultGenerator.generateSuccessResultWithData(newBeeMallIndexCategoryVOS);
     }
 }

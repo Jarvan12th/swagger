@@ -45,7 +45,7 @@ public class NewBeeMallShoppingCartController {
 
         PageQueryUtils pageQueryUtils = new PageQueryUtils(params);
         PageResult pageResult = newBeeMallShoppingCartService.getMyShoppingCartItems(pageQueryUtils);
-        return ResultGenerator.generateSuccessResult(pageResult);
+        return ResultGenerator.generateSuccessResultWithData(pageResult);
     }
 
     @ApiOperation(value = "List Cart Item", notes = "List Cart Item")
@@ -53,7 +53,7 @@ public class NewBeeMallShoppingCartController {
     public Result<List<NewBeeMallShoppingCartItemVO>> cartItemList(@TokenToMallUser MallUser mallUser) {
         List<NewBeeMallShoppingCartItemVO> newBeeMallShoppingCartItemVOS = newBeeMallShoppingCartService.getMyShoppingCartItems(mallUser.getUserId());
 
-        return ResultGenerator.generateSuccessResult(newBeeMallShoppingCartItemVOS);
+        return ResultGenerator.generateSuccessResultWithData(newBeeMallShoppingCartItemVOS);
     }
 
     @ApiOperation(value = "Save Goods to Cart", notes = "Save Goods to Cart")
@@ -115,6 +115,6 @@ public class NewBeeMallShoppingCartController {
             NewBeeMallException.fail("price error");
         }
 
-        return ResultGenerator.generateSuccessResult(newBeeMallShoppingCartItemVOS);
+        return ResultGenerator.generateSuccessResultWithData(newBeeMallShoppingCartItemVOS);
     }
 }

@@ -22,7 +22,7 @@ public class TestSwaggerController {
     @ApiOperation(value = "Get User List", notes = "Get user list")
     @GetMapping("/users")
     public Result<List<User>> getUserList() {
-        return ResultGenerator.generateSuccessResult(new ArrayList<>(userMap.values()));
+        return ResultGenerator.generateSuccessResultWithData(new ArrayList<>(userMap.values()));
     }
 
     @ApiOperation(value = "Add New User", notes = "Add new user")
@@ -30,14 +30,14 @@ public class TestSwaggerController {
     @PostMapping("/users")
     public Result<Boolean> postUser(@RequestBody User user) {
         userMap.put(user.getId(), user);
-        return ResultGenerator.generateSuccessResult(true);
+        return ResultGenerator.generateSuccessResultWithData(true);
     }
 
     @ApiOperation(value = "Get User", notes = "Get user according to id")
     @ApiImplicitParam(name = "id", value = "User id", required = true, dataType = "int")
     @GetMapping("/users/{id}")
     public Result<User> getUser(@PathVariable Integer id) {
-        return ResultGenerator.generateSuccessResult(userMap.get(id));
+        return ResultGenerator.generateSuccessResultWithData(userMap.get(id));
     }
 
     @ApiOperation(value = "Update User", notes = "Update user info")
@@ -48,7 +48,7 @@ public class TestSwaggerController {
     @PutMapping("/users/{id}")
     public Result<Boolean> putUser(@PathVariable Integer id, @RequestBody User user) {
         userMap.put(id, new User(id, user.getName(), user.getPassword()));
-        return ResultGenerator.generateSuccessResult(true);
+        return ResultGenerator.generateSuccessResultWithData(true);
     }
 
     @ApiOperation(value = "Delete User", notes = "Delete user")
@@ -56,6 +56,6 @@ public class TestSwaggerController {
     @DeleteMapping("/users/{id}")
     public Result<Boolean> deleteUser(@PathVariable Integer id) {
         userMap.remove(id);
-        return ResultGenerator.generateSuccessResult(true);
+        return ResultGenerator.generateSuccessResultWithData(true);
     }
 }

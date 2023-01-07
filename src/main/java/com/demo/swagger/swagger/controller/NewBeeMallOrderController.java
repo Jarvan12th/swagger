@@ -97,7 +97,7 @@ public class NewBeeMallOrderController {
                                                            @TokenToMallUser MallUser mallUser) {
         NewBeeMallOrderDetailVO newBeeMallOrderDetailVO = newBeeMallOrderService.getOrderDetailByOrderNo(orderNo, mallUser.getUserId());
 
-        return ResultGenerator.generateSuccessResult(newBeeMallOrderDetailVO);
+        return ResultGenerator.generateSuccessResultWithData(newBeeMallOrderDetailVO);
     }
 
     @ApiOperation(value = "Get Order List", notes = "Get Order List")
@@ -118,6 +118,6 @@ public class NewBeeMallOrderController {
         PageQueryUtils pageQueryUtils = new PageQueryUtils(params);
         PageResult pageResult = newBeeMallOrderService.getMyOrders(pageQueryUtils);
 
-        return ResultGenerator.generateSuccessResult(pageResult);
+        return ResultGenerator.generateSuccessResultWithData(pageResult);
     }
 }

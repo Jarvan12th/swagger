@@ -71,7 +71,7 @@ public class NewBeeMallGoodsController {
         PageQueryUtils pageQueryUtils = new PageQueryUtils(params);
         PageResult pageResult = newBeeMallGoodsService.searchNewBeeMallGoods(pageQueryUtils);
 
-        return ResultGenerator.generateSuccessResult(pageResult);
+        return ResultGenerator.generateSuccessResultWithData(pageResult);
     }
 
     @ApiOperation(value = "Good Detail Api", notes = "Get Goods Detail")
@@ -96,6 +96,6 @@ public class NewBeeMallGoodsController {
         BeanUtils.copyProperties(newBeeMallGoods, newBeeMallGoodsDetailVO);
         newBeeMallGoodsDetailVO.setGoodsCarouselList(newBeeMallGoods.getGoodsCarousel().split(","));
 
-        return ResultGenerator.generateSuccessResult(newBeeMallGoodsDetailVO);
+        return ResultGenerator.generateSuccessResultWithData(newBeeMallGoodsDetailVO);
     }
 }
