@@ -27,6 +27,7 @@ import java.util.Map;
 @RestController
 @Api(value = "v1", tags = "Cart Api")
 @RequestMapping("/api/v1")
+@CrossOrigin(origins = "http://localhost:8081", allowedHeaders = "*", allowCredentials = "true")
 public class NewBeeMallShoppingCartController {
 
     @Resource
