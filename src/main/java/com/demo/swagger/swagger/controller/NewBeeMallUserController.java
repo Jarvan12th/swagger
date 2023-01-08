@@ -27,6 +27,7 @@ import javax.validation.Valid;
 @Api(value = "v1", tags = "User Related Api")
 @RequestMapping("/api/v1")
 @Slf4j
+@CrossOrigin(origins = "http://localhost:8081", allowedHeaders = "*", allowCredentials = "true")
 public class NewBeeMallUserController {
 
     @Resource
