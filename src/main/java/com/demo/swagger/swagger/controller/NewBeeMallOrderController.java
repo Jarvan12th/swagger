@@ -113,6 +113,18 @@ public class NewBeeMallOrderController {
         return ResultGenerator.generateFailResult(cancelOrderResult);
     }
 
+    @ApiOperation(value = "Finish Order", notes = "Finish Order")
+    @PutMapping("/order/{orderNo}/finish")
+    public Result finishOrder(@ApiParam(value = "Order No") @PathVariable("orderNo") String orderNo,
+                              @TokenToMallUser MallUser mallUser) {
+        String finishOrderResult = newBeeMallOrderService.finishOrder(orderNo, mallUser.getUserId());
+        if (finishOrderResult.equals(ServiceResultEnum.SUCCESS.getResult())) {
+            return ResultGenerator.generateSuccessResultWithData(finishOrderResult);
+        }
+
+        return ResultGenerator.generateFailResult(finishOrderResult);
+    }
+
     @ApiOperation(value = "Get Order List", notes = "Get Order List")
     @GetMapping("/order")
     public Result<PageResult<List<NewBeeMallOrderListVO>>> orderList(@ApiParam(value = "pageNumber") @RequestParam(required = false) Integer pageNumber,

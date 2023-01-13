@@ -220,6 +220,31 @@ public class NewBeeMallOrderServiceImpl implements NewBeeMallOrderService {
         return ServiceResultEnum.ORDER_NOT_EXIST_ERROR.getResult();
     }
 
+    @Override
+    public String finishOrder(String orderNo, Long userId) {
+        NewBeeMallOrder newBeeMallOrder = newBeeMallOrderMapper.selectByOrderNo(orderNo);
+        if (newBeeMallOrder != null) {
+            if (!newBeeMallOrder.getUserId().equals(userId)) {
+                return ServiceResultEnum.NO_PERMISSION_ERROR.getResult();
+            }
+            if (newBeeMallOrder.getOrderStatus().intValue() != NewBeeMallOrderStatusEnum.ORDER_EXPRESS.getOrderStatus()) {
+                return ServiceResultEnum.ORDER_STATUS_ERROR.getResult();
+            }
+            newBeeMallOrder.setOrderStatus((byte) NewBeeMallOrderStatusEnum.ORDER_SUCCESS.getOrderStatus());
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            newBeeMallOrder.setPayTime(Timestamp.valueOf(simpleDateFormat.format(newBeeMallOrder.getPayTime())));
+            newBeeMallOrder.setCreateTime(Timestamp.valueOf(simpleDateFormat.format(newBeeMallOrder.getCreateTime())));
+            newBeeMallOrder.setUpdateTime(Timestamp.valueOf(simpleDateFormat.format(new Date())));
+            if (newBeeMallOrderMapper.updateByPrimaryKeySelective(newBeeMallOrder) > 0) {
+                return ServiceResultEnum.SUCCESS.getResult();
+            }
+
+            return ServiceResultEnum.DB_ERROR.getResult();
+        }
+
+        return ServiceResultEnum.ORDER_NOT_EXIST_ERROR.getResult();
+    }
+
     private Boolean recoverStockNum(List<Long> orderIds) {
         List<NewBeeMallOrderItem> newBeeMallOrderItems = newBeeMallOrderItemMapper.selectByOrderIds(orderIds);
         List<GoodsStock> goodsStocks = BeanUtils.copyList(newBeeMallOrderItems, GoodsStock.class);
