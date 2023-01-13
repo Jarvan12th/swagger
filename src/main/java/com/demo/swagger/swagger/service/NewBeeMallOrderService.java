@@ -18,4 +18,6 @@ public interface NewBeeMallOrderService {
     NewBeeMallOrderDetailVO getOrderDetailByOrderNo(String orderNo, Long userId);
 
     PageResult getMyOrders(PageQueryUtils pageQueryUtils);
+
+    String cancelOrder(String orderNo, Long userId);
 }

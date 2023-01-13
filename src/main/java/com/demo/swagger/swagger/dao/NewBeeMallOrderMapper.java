@@ -6,6 +6,7 @@ import org.apache.ibatis.annotations.*;
 import org.apache.ibatis.jdbc.SQL;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Mapper
 public interface NewBeeMallOrderMapper {
@@ -58,6 +59,9 @@ public interface NewBeeMallOrderMapper {
     @SelectProvider(type = OrderProviderBuilder.class, method = "buildFindNewBeeMallOrderList")
     List<NewBeeMallOrder> findNewBeeMallOrderList(PageQueryUtils pageQueryUtils);
 
+    @UpdateProvider(type = OrderProviderBuilder.class, method = "buildCloseOrder")
+    int closeOrder(List<Long> orderIds, int orderStatus);
+
     class OrderProviderBuilder {
         public static String buildGetTotalNewBeeMallOrders(final PageQueryUtils pageQueryUtils) {
             String whereClause = "user_id = ${userId}";
@@ -85,6 +89,15 @@ public interface NewBeeMallOrderMapper {
                 FROM("tb_newbee_mall_order");
                 WHERE(finalWhereClause);
                 ORDER_BY("create_time DESC LIMIT ${start}, ${limit}");
+            }}.toString();
+        }
+
+        public static String buildCloseOrder(final List<Long> orderIds, final int orderStatus) {
+            String orderIdsStr = orderIds.stream().map(Object::toString).collect(Collectors.joining(","));
+            return new SQL(){{
+                UPDATE("tb_newbee_mall_order");
+                SET("order_status = " + orderStatus + ", update_time = now()");
+                WHERE("order_id in (" + orderIdsStr + ")");
             }}.toString();
         }
     }

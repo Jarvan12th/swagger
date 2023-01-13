@@ -81,6 +81,9 @@ public interface NewBeeMallGoodsMapper {
     @UpdateProvider(type = GoodsProviderBuilder.class, method = "buildUpdateGoodsStock")
     int updateGoodsStock(@Param("goodsStocks") List<GoodsStock> goodsStocks);
 
+    @UpdateProvider(type = GoodsProviderBuilder.class, method = "buildRecoverStockNum")
+    int recoverStockNum(@Param("goodsStocks") List<GoodsStock> goodsStocks);
+
     class GoodsProviderBuilder {
         public static String buildSelectGoodsByPrimaryKeys(final List<Long> goodIds) {
             String goodIdsStr = goodIds.stream().map(Object::toString).collect(Collectors.joining(","));
@@ -140,6 +143,21 @@ public interface NewBeeMallGoodsMapper {
 
             return sb.toString();
         }
+
+        public static String buildRecoverStockNum(final List<GoodsStock> goodsStocks) {
+            StringBuilder updateSql = new StringBuilder();
+            for (GoodsStock goodsStock : goodsStocks) {
+                updateSql.append(new SQL(){{
+                    UPDATE("tb_newbee_mall_goods_info");
+                    SET("stock_num = stock_num + " + goodsStock.getGoodsCount());
+                    WHERE("goods_id = " + goodsStock.getGoodsId() + " AND stock_num >= " + goodsStock.getGoodsCount() + " AND goods_sell_status = 0");
+                }});
+                updateSql.append(";");
+            }
+
+            return updateSql.toString();
+        }
+
 
         private static String getLimitClause(PageQueryUtils pageQueryUtils) {
             StringBuilder sb = new StringBuilder();

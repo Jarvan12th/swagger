@@ -101,6 +101,18 @@ public class NewBeeMallOrderController {
         return ResultGenerator.generateSuccessResultWithData(newBeeMallOrderDetailVO);
     }
 
+    @ApiOperation(value = "Cancel Order", notes = "Cancel Order")
+    @PutMapping("/order/{orderNo}/cancel")
+    public Result cancelOrder(@ApiParam(value = "Order No") @PathVariable("orderNo") String orderNo,
+                              @TokenToMallUser MallUser mallUser) {
+        String cancelOrderResult = newBeeMallOrderService.cancelOrder(orderNo, mallUser.getUserId());
+        if (cancelOrderResult.equals(ServiceResultEnum.SUCCESS.getResult())) {
+            return ResultGenerator.generateSuccessResultWithData(cancelOrderResult);
+        }
+
+        return ResultGenerator.generateFailResult(cancelOrderResult);
+    }
+
     @ApiOperation(value = "Get Order List", notes = "Get Order List")
     @GetMapping("/order")
     public Result<PageResult<List<NewBeeMallOrderListVO>>> orderList(@ApiParam(value = "pageNumber") @RequestParam(required = false) Integer pageNumber,

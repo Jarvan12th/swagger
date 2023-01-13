@@ -61,9 +61,13 @@ public enum ServiceResultEnum {
 
     ORDER_STATUS_ERROR("order status error"),
 
+    CLOSE_ORDER_ERROR("close order eroor"),
+
     OPERATE_ERROR("operate fail"),
 
     REQUEST_FORBIDEN_ERROR("operate forbiden"),
+
+    NO_PERMISSION_ERROR("no permission error"),
 
     DB_ERROR("database error");
 

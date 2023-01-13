@@ -19,10 +19,7 @@ import org.springframework.util.CollectionUtils;
 
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -198,5 +195,39 @@ public class NewBeeMallOrderServiceImpl implements NewBeeMallOrderService {
         }
 
         return new PageResult(newBeeMallOrderListVOS, total, pageQueryUtils.getLimit(), pageQueryUtils.getPage());
+    }
+
+    @Override
+    public String cancelOrder(String orderNo, Long userId) {
+        NewBeeMallOrder newBeeMallOrder = newBeeMallOrderMapper.selectByOrderNo(orderNo);
+        if (newBeeMallOrder != null) {
+            if (!newBeeMallOrder.getUserId().equals(userId)) {
+                NewBeeMallException.fail(ServiceResultEnum.NO_PERMISSION_ERROR.getResult());
+            }
+            if (newBeeMallOrder.getOrderStatus().intValue() == NewBeeMallOrderStatusEnum.ORDER_SUCCESS.getOrderStatus()
+                    || newBeeMallOrder.getOrderStatus().intValue() == NewBeeMallOrderStatusEnum.ORDER_CLOSED_BY_MALLUSER.getOrderStatus()
+                    || newBeeMallOrder.getOrderStatus().intValue() == NewBeeMallOrderStatusEnum.ORDER_CLOSED_BY_EXPIRED.getOrderStatus()
+                    || newBeeMallOrder.getOrderStatus().intValue() == NewBeeMallOrderStatusEnum.ORDER_CLOSED_BY_JUDGE.getOrderStatus()) {
+                return ServiceResultEnum.ORDER_STATUS_ERROR.getResult();
+            }
+            if (newBeeMallOrderMapper.closeOrder(Collections.singletonList(newBeeMallOrder.getOrderId()), NewBeeMallOrderStatusEnum.ORDER_CLOSED_BY_MALLUSER.getOrderStatus()) > 0
+                    && recoverStockNum(Collections.singletonList(newBeeMallOrder.getOrderId()))) {
+                return ServiceResultEnum.SUCCESS.getResult();
+            }
+            return ServiceResultEnum.DB_ERROR.getResult();
+        }
+
+        return ServiceResultEnum.ORDER_NOT_EXIST_ERROR.getResult();
+    }
+
+    private Boolean recoverStockNum(List<Long> orderIds) {
+        List<NewBeeMallOrderItem> newBeeMallOrderItems = newBeeMallOrderItemMapper.selectByOrderIds(orderIds);
+        List<GoodsStock> goodsStocks = BeanUtils.copyList(newBeeMallOrderItems, GoodsStock.class);
+        int updateStockResult = newBeeMallGoodsMapper.recoverStockNum(goodsStocks);
+        if (updateStockResult < 1) {
+            NewBeeMallException.fail(ServiceResultEnum.CLOSE_ORDER_ERROR.getResult());
+        }
+
+        return Boolean.TRUE;
     }
 }
