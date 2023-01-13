@@ -76,7 +76,7 @@ public class NewBeeMallOrderController {
         }
         String saveOrderResult = newBeeMallOrderService.saveOrder(mallUser, mallUserAddress, newBeeMallShoppingCartItemVOS);
 
-        return ResultGenerator.generateSuccessResult(saveOrderResult);
+        return ResultGenerator.generateSuccessResultWithData(saveOrderResult);
     }
 
     @ApiOperation(value = "Mock Success Pay", notes = "Mock Success Pay")
