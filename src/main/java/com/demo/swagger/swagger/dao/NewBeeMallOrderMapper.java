@@ -3,6 +3,7 @@ package com.demo.swagger.swagger.dao;
 import com.demo.swagger.swagger.entity.NewBeeMallOrder;
 import com.demo.swagger.swagger.utils.PageQueryUtils;
 import org.apache.ibatis.annotations.*;
+import org.apache.ibatis.jdbc.SQL;
 
 import java.util.List;
 
@@ -37,7 +38,7 @@ public interface NewBeeMallOrderMapper {
             "order_status = ${orderStatus}, update_time = '${updateTime}' WHERE order_id = ${orderId}")
     int updateByPrimaryKeySelective(NewBeeMallOrder newBeeMallOrder);
 
-    @Select("SELECT count(*) FROM tb_newbee_mall_order WHERE user_id = ${userId} AND order_status = ${orderStatus}")
+    @SelectProvider(type = OrderProviderBuilder.class, method = "buildGetTotalNewBeeMallOrders")
     int getTotalNewBeeMallOrders(PageQueryUtils pageQueryUtils);
 
     @Results(id = "NewBeeMallOrderList", value = {
@@ -54,7 +55,37 @@ public interface NewBeeMallOrderMapper {
             @Result(property = "createTime", column = "create_time"),
             @Result(property = "updateTime", column = "update_time")
     })
-    @Select("SELECT * FROM tb_newbee_mall_order WHERE user_id = ${userId} AND order_status = ${orderStatus} " +
-            "ORDER BY create_time DESC LIMIT ${start}, ${limit}")
+    @SelectProvider(type = OrderProviderBuilder.class, method = "buildFindNewBeeMallOrderList")
     List<NewBeeMallOrder> findNewBeeMallOrderList(PageQueryUtils pageQueryUtils);
+
+    class OrderProviderBuilder {
+        public static String buildGetTotalNewBeeMallOrders(final PageQueryUtils pageQueryUtils) {
+            String whereClause = "user_id = ${userId}";
+            if (pageQueryUtils.get("orderStatus") != null) {
+                whereClause +=  " AND order_status = " + pageQueryUtils.get("orderStatus");
+            }
+
+            String finalWhereClause = whereClause;
+            return new SQL(){{
+                SELECT("count(*)");
+                FROM("tb_newbee_mall_order");
+                WHERE(finalWhereClause);
+            }}.toString();
+        }
+
+        public static String buildFindNewBeeMallOrderList(final PageQueryUtils pageQueryUtils) {
+            String whereClause = "user_id = ${userId}";
+            if (pageQueryUtils.get("orderStatus") != null) {
+                whereClause +=  " AND order_status = " + pageQueryUtils.get("orderStatus");
+            }
+
+            String finalWhereClause = whereClause;
+            return new SQL(){{
+                SELECT("*");
+                FROM("tb_newbee_mall_order");
+                WHERE(finalWhereClause);
+                ORDER_BY("create_time DESC LIMIT ${start}, ${limit}");
+            }}.toString();
+        }
+    }
 }
